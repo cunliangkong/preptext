@@ -4,7 +4,7 @@ from .entry import Entry
 from .datastorage import DataStorage
 from .vocab import Vocab, Vectors
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "Field",
