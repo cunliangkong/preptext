@@ -35,7 +35,8 @@ setup_info = dict(
     install_requires=['tqdm', 'numpy', 'six'],
 
     # Package info
-    packages=find_packages(exclude=('test', 'test.*')),
+    packages=find_packages(exclude=('datastorage.py', 'entry.py', 'field.py',
+                                    'vocab.py')),
     zip_safe=True,
 )
 
