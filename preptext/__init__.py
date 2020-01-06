@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
-from .field import Field, Fields
-from .entry import Entry
-from .datastorage import DataStorage
-from .vocab import Vocab, Vectors
+from .__field import Field, Fields
+from .__entry import Entry
+from .__datastorage import DataStorage
+from .__vocab import Vocab, Vectors
+from . import converter
 
-__version__ = "0.1.1"
+__version__ = "0.1.6"
 
 __all__ = [
-    "Field",
-    "Fields",
-    "Entry",
-    "DataStorage",
-    "Vocab",
-    "Vectors",
+    "Field", "Fields", "Entry", "DataStorage", "Vocab", "Vectors", "converter"
 ]

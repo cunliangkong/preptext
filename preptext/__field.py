@@ -5,8 +5,8 @@ from itertools import chain
 import numpy as np
 from copy import deepcopy
 
-from .vocab import Vocab
-from .datastorage import DataStorage
+from .__vocab import Vocab
+from .__datastorage import DataStorage
 
 
 class Field(object):

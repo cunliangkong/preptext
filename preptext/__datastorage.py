@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pickle
 
-from .entry import Entry
+from .__entry import Entry
 
 
 class DataStorage(object):
