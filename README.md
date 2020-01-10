@@ -3,8 +3,6 @@
 Utilities of preparing datasets for deep learning models.
 Can easily convert your text-formatted data into a `DataLoader` of `pytorch`.
 
-[TOC]
-
 ## Installation
 
 ```bash
