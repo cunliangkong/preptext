@@ -188,14 +188,14 @@ class Vocab(object):
 
 class Vectors(object):
     def __init__(self,
-                 name,
+                 file_path,
                  cache=None,
                  prefix=None,
                  unk_init=None,
                  max_vectors=None):
         """
         Arguments:
-           name: name of the file that contains the vectors
+           file_path: file that contains the vectors
            cache: directory for cached vectors
            prefix: prefix while caching vectors
            unk_init (callback): by default, initialize out-of-vocabulary
@@ -216,21 +216,21 @@ class Vectors(object):
         self.vectors = None
         self.dim = None
         self.unk_init = self.__unk_init if unk_init is None else unk_init
-        self.cache(name, cache, prefix=prefix, max_vectors=max_vectors)
+        self.cache(file_path, cache, prefix=prefix, max_vectors=max_vectors)
 
-    def cache(self, name, cache, prefix=None, max_vectors=None):
-        if os.path.isfile(name):
-            path = name
+    def cache(self, file_path, cache, prefix=None, max_vectors=None):
+        if os.path.isfile(file_path):
+            path = file_path
             if max_vectors:
                 file_suffix = '_{}.pkl'.format(max_vectors)
             else:
                 file_suffix = '.pkl'
-            vec_name = os.path.basename(name)
+            vec_name = os.path.basename(file_path)
             if prefix:
                 vec_name = prefix + vec_name
             path_pt = os.path.join(cache, vec_name) + file_suffix
         else:
-            vec_name = name
+            vec_name = file_path
             if prefix:
                 vec_name = prefix + vec_name
             path = os.path.join(cache, vec_name)

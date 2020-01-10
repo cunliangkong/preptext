@@ -102,7 +102,8 @@ class Field(object):
             self.__max_len = 0
         else:
             self.__max_len = None
-        self.vocab = None
+        if self.use_vocab:
+            self.vocab = None
 
     def preprocess(self, data):
         if self.sequential and isinstance(data, six.text_type):
@@ -209,6 +210,7 @@ class Field(object):
                     vocabulary at first. If it is False, they are added into
                     the vocabulary at last. Default: True.
         """
+        assert self.use_vocab, "use_vocab is specified to False."
         counter = Counter()
         sources = []
         for arg in args:
