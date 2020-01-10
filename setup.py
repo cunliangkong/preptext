@@ -36,7 +36,7 @@ setup_info = dict(
     url='https://github.com/styxjedi/preptext',
     description='Utilities for preprocessing texts',
     license='BSD',
-    install_requires=['tqdm', 'numpy', 'six'],
+    install_requires=['tqdm', 'numpy', 'six', 'torch'],
     long_description=long_description,
     long_description_content_type='text/markdown',
     # Package info
