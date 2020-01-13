@@ -181,7 +181,7 @@ class Field(object):
                     for x in arr
                 ]
             else:
-                arr = self.final_dtype(arr) if not isinstance(arr, self.final_dtype)
+                arr = self.final_dtype(arr) if not isinstance(arr, self.final_dtype) else arr
             if self.postprocessing is not None:
                 arr = self.postprocessing(arr)
         var = np.asarray(arr)
