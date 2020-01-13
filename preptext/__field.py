@@ -36,7 +36,7 @@ class Field(object):
         fix_length: A fixed length that all examples
             using this field will be padded to
             or None for max sequence lengths. Default: None.
-        dtype: Data type that represents a batch of examples
+        final_dtype: Data type that represents a batch of examples
             of this kind of data. Default: int.
         preprocessing: The Pipeline that will be applied to examples
             using this field after tokenizing but before numericalizing. Many
@@ -67,7 +67,7 @@ class Field(object):
                  init_token=None,
                  eos_token=None,
                  fix_length=None,
-                 dtype=int,
+                 final_dtype=int,
                  preprocessing=None,
                  postprocessing=None,
                  lower=False,
@@ -84,7 +84,7 @@ class Field(object):
         if fix_length:
             assert isinstance(fix_length, int), "fix_length must be int"
         self.fix_length = fix_length
-        self.dtype = dtype
+        self.final_dtype = final_dtype
         self.preprocessing = preprocessing
         self.postprocessing = postprocessing
         self.lower = lower
@@ -175,11 +175,13 @@ class Field(object):
             if self.postprocessing is not None:
                 arr = self.postprocessing(arr)
         else:
-            if not self.sequential:
+            if self.sequential:
                 arr = [
-                    self.dtype(x) if not isinstance(x, self.dtype) else x
+                    self.final_dtype(x) if not isinstance(x, self.final_dtype) else x
                     for x in arr
                 ]
+            else:
+                arr = self.final_dtype(arr) if not isinstance(arr, self.final_dtype)
             if self.postprocessing is not None:
                 arr = self.postprocessing(arr)
         var = np.asarray(arr)
@@ -263,7 +265,7 @@ class Fields(object):
                   init_token=None,
                   eos_token=None,
                   fix_length=None,
-                  dtype=int,
+                  final_dtype=int,
                   preprocessing=None,
                   postprocessing=None,
                   lower=False,
@@ -289,7 +291,7 @@ class Fields(object):
                 using this field will be padded to
                 or None for max sequence lengths.
                 Default: None.
-            dtype: Data type that represents a batch of examples
+            final_dtype: Data type that represents a batch of examples
                 of this kind of data. Default: int.
             preprocessing: The Pipeline that will be applied to examples
                 using this field after tokenizing but before numericalizing.
@@ -314,7 +316,7 @@ class Fields(object):
                 Default: None
         """
         args = [
-            sequential, use_vocab, init_token, eos_token, fix_length, dtype,
+            sequential, use_vocab, init_token, eos_token, fix_length, final_dtype,
             preprocessing, postprocessing, lower, include_lengths, pad_token,
             unk_token, pad_first, truncate_first, stop_words
         ]
