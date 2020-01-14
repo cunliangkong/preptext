@@ -145,7 +145,8 @@ class Field(object):
             x.pop(-1)
 
         if self.pad_first:
-            padded = [self.pad_token] * max(0, max_len - len(x)) \
+            padded = ([] if self.pad_token is None else[
+                    self.pad_token] * max(0, max_len - len(x))) \
                 + ([] if self.init_token is None else [self.init_token]) \
                 + list(x[-max_len:] if self.truncate_first else x[:max_len]) \
                 + ([] if self.eos_token is None else [self.eos_token])
@@ -153,7 +154,8 @@ class Field(object):
             padded = ([] if self.init_token is None else [self.init_token]) \
                 + list(x[-max_len:] if self.truncate_first else x[:max_len]) \
                 + ([] if self.eos_token is None else [self.eos_token]) \
-                + [self.pad_token] * max(0, max_len - len(x))
+                + ([] if self.pad_token is None else[
+                    self.pad_token] * max(0, max_len - len(x)))
 
         length = len(padded) - max(0, max_len - len(x))
 
@@ -177,11 +179,12 @@ class Field(object):
         else:
             if self.sequential:
                 arr = [
-                    self.final_dtype(x) if not isinstance(x, self.final_dtype) else x
-                    for x in arr
+                    self.final_dtype(x)
+                    if not isinstance(x, self.final_dtype) else x for x in arr
                 ]
             else:
-                arr = self.final_dtype(arr) if not isinstance(arr, self.final_dtype) else arr
+                arr = self.final_dtype(arr) if not isinstance(
+                    arr, self.final_dtype) else arr
             if self.postprocessing is not None:
                 arr = self.postprocessing(arr)
         var = np.asarray(arr)
@@ -316,9 +319,9 @@ class Fields(object):
                 Default: None
         """
         args = [
-            sequential, use_vocab, init_token, eos_token, fix_length, final_dtype,
-            preprocessing, postprocessing, lower, include_lengths, pad_token,
-            unk_token, pad_first, truncate_first, stop_words
+            sequential, use_vocab, init_token, eos_token, fix_length,
+            final_dtype, preprocessing, postprocessing, lower, include_lengths,
+            pad_token, unk_token, pad_first, truncate_first, stop_words
         ]
         self.__fields[name] = Field(*args)
 

@@ -5,7 +5,7 @@ from .__datastorage import DataStorage
 from .__vocab import Vocab, Vectors
 from . import converter
 
-__version__ = "0.1.9"
+__version__ = "0.1.10"
 
 __all__ = [
     "Field", "Fields", "Entry", "DataStorage", "Vocab", "Vectors", "converter"
