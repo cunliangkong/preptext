@@ -299,6 +299,7 @@ class Fields(object):
                   unk_token="<unk>",
                   pad_first=False,
                   truncate_first=False,
+                  multiple=False,
                   stop_words=None):
         """
         Attributes:
@@ -337,13 +338,16 @@ class Fields(object):
                 Default: False.
             truncate_first: Do the truncating of the sequence at the beginning.
                 Default: False
+            multiple: If this field contains multiple lines of data.
+                Default: False
             stop_words: Tokens to discard during the preprocessing step.
                 Default: None
         """
         args = [
             sequential, use_vocab, init_token, eos_token, fix_length,
             final_dtype, preprocessing, postprocessing, lower, include_lengths,
-            pad_token, unk_token, pad_first, truncate_first, stop_words
+            pad_token, unk_token, pad_first, truncate_first, multiple,
+            stop_words
         ]
         self.__fields[name] = Field(*args)
 
