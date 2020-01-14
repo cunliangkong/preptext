@@ -58,6 +58,8 @@ class Field(object):
             Default: False.
         truncate_first: Do the truncating of the sequence at the beginning.
             Default: False
+        multiple: If this field contains multiple lines of data.
+            Default: False
         stop_words: Tokens to discard during the preprocessing step.
             Default: None
     """
@@ -76,6 +78,7 @@ class Field(object):
                  unk_token="<unk>",
                  pad_first=False,
                  truncate_first=False,
+                 multiple=False,
                  stop_words=None):
         self.sequential = sequential
         self.use_vocab = use_vocab
@@ -93,6 +96,7 @@ class Field(object):
         self.unk_token = unk_token
         self.pad_first = pad_first
         self.truncate_first = truncate_first
+        self.multiple = multiple
         try:
             self.stop_words = set(
                 stop_words) if stop_words is not None else None
@@ -105,7 +109,7 @@ class Field(object):
         if self.use_vocab:
             self.vocab = None
 
-    def preprocess(self, data):
+    def __preprocess_single(self, data):
         if self.sequential and isinstance(data, six.text_type):
             data = data.rstrip('\n').split()
         if self.lower:
@@ -124,9 +128,25 @@ class Field(object):
             self.__max_len = max(self.__max_len, len_data)
         return data
 
+    def preprocess(self, data):
+        if self.multiple:
+            for idx, d in enumerate(data):
+                data[idx] = self.__preprocess_single(d)
+        else:
+            data = self.__preprocess_single(data)
+        return data
+
     def process(self, x):
-        padded = self.pad(x)
-        array = self.numericalize(padded)
+        if self.multiple:
+            array = []
+            for x_line in x:
+                padded_line = self.pad(x_line)
+                array_line = self.numericalize(padded_line)
+                array.append(array_line)
+
+        else:
+            padded = self.pad(x)
+            array = self.numericalize(padded)
         return array
 
     def pad(self, inp_x):
@@ -230,6 +250,8 @@ class Field(object):
             for x in data:
                 if not self.sequential:
                     x = [x]
+                if self.multiple:
+                    x = [j for i in x for j in i]
                 try:
                     counter.update(x)
                 except TypeError:
