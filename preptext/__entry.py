@@ -8,7 +8,6 @@ class Entry(object):
     Stores each column of the entry as an attribute.
     """
     def __init__(self, single_data, fields):
-        self.fields = fields
         for (name, field), data in zip(fields.items(), single_data):
             if field is not None:
                 if isinstance(data, six.text_type):
@@ -18,6 +17,7 @@ class Entry(object):
                         setattr(self, n, f.preprocess(data))
                 else:
                     setattr(self, name, field.preprocess(data))
+        self.fields = fields
 
     def get_array(self):
         arr = []

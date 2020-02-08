@@ -76,6 +76,7 @@ class Field(object):
                  include_lengths=False,
                  pad_token="<pad>",
                  unk_token="<unk>",
+                 padding=True,
                  pad_first=False,
                  truncate_first=False,
                  multiple=False,
@@ -92,8 +93,9 @@ class Field(object):
         self.postprocessing = postprocessing
         self.lower = lower
         self.include_lengths = include_lengths
-        self.pad_token = pad_token if self.sequential else None
+        self.pad_token = pad_token
         self.unk_token = unk_token
+        self.padding = padding if self.sequential and self.pad_token else False
         self.pad_first = pad_first
         self.truncate_first = truncate_first
         self.multiple = multiple
@@ -159,13 +161,14 @@ class Field(object):
         else:
             max_len = self.__max_len
 
-        if x[0] == self.init_token:
-            x.pop(0)
-        if x[-1] == self.eos_token:
-            x.pop(-1)
+        if x:
+            if x[0] == self.init_token:
+                x.pop(0)
+            if x[-1] == self.eos_token:
+                x.pop(-1)
 
         if self.pad_first:
-            padded = ([] if self.pad_token is None else[
+            padded = ([] if not self.padding else[
                     self.pad_token] * max(0, max_len - len(x))) \
                 + ([] if self.init_token is None else [self.init_token]) \
                 + list(x[-max_len:] if self.truncate_first else x[:max_len]) \
@@ -174,7 +177,7 @@ class Field(object):
             padded = ([] if self.init_token is None else [self.init_token]) \
                 + list(x[-max_len:] if self.truncate_first else x[:max_len]) \
                 + ([] if self.eos_token is None else [self.eos_token]) \
-                + ([] if self.pad_token is None else[
+                + ([] if not self.padding else[
                     self.pad_token] * max(0, max_len - len(x)))
 
         length = len(padded) - max(0, max_len - len(x))
@@ -263,6 +266,11 @@ class Field(object):
                            unk_token=self.unk_token,
                            **kwargs)
 
+    def get_max_len(self):
+        max_len = self.__max_len + (self.init_token,
+                                    self.eos_token).count(None) - 2
+        return max_len
+
     def __eq__(self, other):
         if not isinstance(other, Field):
             return False
@@ -297,6 +305,7 @@ class Fields(object):
                   include_lengths=False,
                   pad_token="<pad>",
                   unk_token="<unk>",
+                  padding=True,
                   pad_first=False,
                   truncate_first=False,
                   multiple=False,
@@ -346,7 +355,7 @@ class Fields(object):
         args = [
             sequential, use_vocab, init_token, eos_token, fix_length,
             final_dtype, preprocessing, postprocessing, lower, include_lengths,
-            pad_token, unk_token, pad_first, truncate_first, multiple,
+            pad_token, unk_token, padding, pad_first, truncate_first, multiple,
             stop_words
         ]
         self.__fields[name] = Field(*args)
