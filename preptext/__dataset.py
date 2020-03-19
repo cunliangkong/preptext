@@ -59,7 +59,10 @@ class BucketCollate(object):
     def __align(self, batch):
         for idx, (name, field) in enumerate(self.fields.items()):
             if field.sequential:
-                pad_idx = field.vocab.stoi[field.pad_token]
+                try:
+                    pad_idx = field.vocab.stoi[field.pad_token]
+                except AttributeError:
+                    pad_idx = -1
                 max_len = 0
                 if field.include_lengths:
                     max_len = max(batch[idx][1]).item()

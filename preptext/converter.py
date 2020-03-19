@@ -72,6 +72,7 @@ def to_distributeddataloader(datastorage,
         batch_size=batch_size,
         num_workers=num_workers,
         pin_memory=pin_memory,
+        shuffle=False,
         sampler=distributed_sampler,
         timeout=timeout,
         worker_init_fn=worker_init_fn)
