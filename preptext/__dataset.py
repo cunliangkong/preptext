@@ -58,7 +58,7 @@ class BucketCollate(object):
 
     def __align(self, batch):
         for idx, (name, field) in enumerate(self.fields.items()):
-            if field.sequential:
+            if field.sequential and not field.fix_length:
                 try:
                     pad_idx = field.vocab.stoi[field.pad_token]
                 except AttributeError:

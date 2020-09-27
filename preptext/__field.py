@@ -58,8 +58,6 @@ class Field(object):
             Default: False.
         truncate_first: Do the truncating of the sequence at the beginning.
             Default: False
-        multiple: If this field contains multiple lines of data.
-            Default: False
         stop_words: Tokens to discard during the preprocessing step.
             Default: None
     """
@@ -79,14 +77,11 @@ class Field(object):
                  padding=True,
                  pad_first=False,
                  truncate_first=False,
-                 multiple=False,
                  stop_words=None):
         self.sequential = sequential
         self.use_vocab = use_vocab
         self.init_token = init_token
         self.eos_token = eos_token
-        if fix_length:
-            assert isinstance(fix_length, int), "fix_length must be int"
         self.fix_length = fix_length
         self.final_dtype = final_dtype
         self.preprocessing = preprocessing
@@ -98,20 +93,19 @@ class Field(object):
         self.padding = padding if self.sequential and self.pad_token else False
         self.pad_first = pad_first
         self.truncate_first = truncate_first
-        self.multiple = multiple
         try:
             self.stop_words = set(
                 stop_words) if stop_words is not None else None
         except TypeError:
             raise ValueError("Stop words must be convertible to a set")
         if self.sequential:
-            self.__max_len = 0
+            self.max_len = 0
         else:
-            self.__max_len = None
+            self.max_len = None
         if self.use_vocab:
             self.vocab = None
 
-    def __preprocess_single(self, data):
+    def preprocess(self, data):
         if self.sequential and isinstance(data, six.text_type):
             data = data.rstrip('\n').split()
         if self.lower:
@@ -125,41 +119,25 @@ class Field(object):
         if self.preprocessing is not None:
             data = self.preprocessing(data)
         if self.sequential:
-            len_data = len(data) + (self.init_token,
-                                    self.eos_token).count(None) - 2
-            self.__max_len = max(self.__max_len, len_data)
-        return data
-
-    def preprocess(self, data):
-        if self.multiple:
-            for idx, d in enumerate(data):
-                data[idx] = self.__preprocess_single(d)
-        else:
-            data = self.__preprocess_single(data)
+            len_data = len(data)
+            self.max_len = max(self.max_len, len_data)
         return data
 
     def process(self, x):
-        if self.multiple:
-            array = []
-            for x_line in x:
-                padded_line = self.pad(x_line)
-                array_line = self.numericalize(padded_line)
-                array.append(array_line)
-
-        else:
-            padded = self.pad(x)
-            array = self.numericalize(padded)
+        padded = self.pad(x)
+        array = self.numericalize(padded)
         return array
 
     def pad(self, inp_x):
         x = deepcopy(inp_x)
         if not self.sequential:
             return x
-        if self.fix_length:
+        if self.fix_length and not isinstance(self.fix_length, bool):
             max_len = self.fix_length + (self.init_token,
                                          self.eos_token).count(None) - 2
         else:
-            max_len = self.__max_len
+            max_len = self.max_len + (self.init_token,
+                                      self.eos_token).count(None) - 2
 
         if x:
             if x[0] == self.init_token:
@@ -253,8 +231,6 @@ class Field(object):
             for x in data:
                 if not self.sequential:
                     x = [x]
-                if self.multiple:
-                    x = [j for i in x for j in i]
                 try:
                     counter.update(x)
                 except TypeError:
@@ -267,9 +243,7 @@ class Field(object):
                            **kwargs)
 
     def get_max_len(self):
-        max_len = self.__max_len + (self.init_token,
-                                    self.eos_token).count(None) - 2
-        return max_len
+        return getattr(self, 'max_len')
 
     def __eq__(self, other):
         if not isinstance(other, Field):
@@ -308,7 +282,6 @@ class Fields(object):
                   padding=True,
                   pad_first=False,
                   truncate_first=False,
-                  multiple=False,
                   stop_words=None):
         """
         Attributes:
@@ -347,15 +320,13 @@ class Fields(object):
                 Default: False.
             truncate_first: Do the truncating of the sequence at the beginning.
                 Default: False
-            multiple: If this field contains multiple lines of data.
-                Default: False
             stop_words: Tokens to discard during the preprocessing step.
                 Default: None
         """
         args = [
             sequential, use_vocab, init_token, eos_token, fix_length,
             final_dtype, preprocessing, postprocessing, lower, include_lengths,
-            pad_token, unk_token, padding, pad_first, truncate_first, multiple,
+            pad_token, unk_token, padding, pad_first, truncate_first,
             stop_words
         ]
         self.__fields[name] = Field(*args)

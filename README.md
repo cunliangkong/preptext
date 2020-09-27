@@ -48,7 +48,7 @@ fields.add_field(
 
 You would see more parameters when using.
 
-Basicly, the same field used in different datasets (train, valid, test) would share the same vocab. And vocabs fo different fields are isolated from each other.
+Basicly, the same field used in different datasets (train, valid, test) would share the same vocab. And vocabs of different fields are isolated from each other.
 
 ### 2. Add each entry to a DataStorage
 
